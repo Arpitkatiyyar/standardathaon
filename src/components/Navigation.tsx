@@ -53,14 +53,16 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#34a1eb] to-[#9c371e] rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                BIS
-              </div>
+              <img
+                src="/images/bislogo.png"
+                alt="BIS Logo"
+                className="w-12 h-12 rounded-lg shadow-lg object-contain bg-white"
+              />
               <div>
                 <h1 className="text-xl font-bold text-gray-900 leading-tight">
-                  BIS × NIT Hamirpur
+                  STANDARDATHON
                 </h1>
-                <p className="text-xs text-gray-600">Hackathon 2024</p>
+                <p className="text-xs text-gray-600">BIS × NIT Hamirpur</p>
               </div>
             </div>
           </div>
