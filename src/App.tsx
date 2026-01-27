@@ -189,12 +189,14 @@ function AppRoutes() {
             <div className="grid md:grid-cols-3 gap-8 mb-8">
               <div>
                 <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#34a1eb] to-[#9c371e] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                    BIS
-                  </div>
+                  <img
+                    src="/images/bislogo.png"
+                    alt="BIS Logo"
+                    className="w-12 h-12 rounded-lg shadow-lg object-contain bg-white"
+                  />
                   <div>
-                    <h3 className="font-bold text-lg">BIS × NIT Hamirpur</h3>
-                    <p className="text-gray-400 text-sm">Hackathon 2024</p>
+                    <h3 className="font-bold text-lg">Standardathon</h3>
+                    <p className="text-gray-400 text-sm">BIS × NIT Hamirpur</p>
                   </div>
                 </div>
                 <p className="text-gray-400 text-sm">
