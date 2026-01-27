@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User, Users, Copy, Check, Plus, LogIn, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 interface Team {
   id: string;
@@ -39,6 +39,11 @@ export default function Dashboard() {
   const [copiedCode, setCopiedCode] = useState(false);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
     if (profile?.team_id) {
       fetchTeamData();
     } else {
@@ -47,6 +52,7 @@ export default function Dashboard() {
   }, [profile]);
 
   const fetchTeamData = async () => {
+    if (!isSupabaseConfigured) return;
     if (!profile?.team_id) return;
 
     try {
@@ -81,6 +87,10 @@ export default function Dashboard() {
   };
 
   const createTeam = async () => {
+    if (!isSupabaseConfigured) {
+      setError('Supabase is not configured');
+      return;
+    }
     if (!teamName.trim()) {
       setError('Please enter a team name');
       return;
@@ -130,12 +140,17 @@ export default function Dashboard() {
   };
 
   const generateTeamCode = async (): Promise<string> => {
+    if (!isSupabaseConfigured) throw new Error('Supabase is not configured');
     const { data, error } = await supabase.rpc('generate_team_code');
     if (error) throw error;
     return data;
   };
 
   const joinTeam = async () => {
+    if (!isSupabaseConfigured) {
+      setError('Supabase is not configured');
+      return;
+    }
     if (!joinCode.trim()) {
       setError('Please enter a team code');
       return;
@@ -195,6 +210,10 @@ export default function Dashboard() {
   };
 
   const leaveTeam = async () => {
+    if (!isSupabaseConfigured) {
+      setError('Supabase is not configured');
+      return;
+    }
     if (!profile?.team_id || !team) return;
 
     if (team.leader_id === user!.id) {
@@ -235,6 +254,10 @@ export default function Dashboard() {
   };
 
   const deleteTeam = async () => {
+    if (!isSupabaseConfigured) {
+      setError('Supabase is not configured');
+      return;
+    }
     if (!team || team.leader_id !== user!.id) return;
 
     if (!confirm('Are you sure you want to delete this team? This action cannot be undone.')) return;
