@@ -16,6 +16,7 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
   const [scrollProgress, setScrollProgress] = useState(0)
   const { user, signOut } = useAuth()
 
+  // 🔹 Scroll effects
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY
@@ -26,11 +27,17 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
       const scrolled = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
       setScrollProgress(scrolled)
       setIsScrolled(scrollTop > 10)
+      setIsMobileMenuOpen(false)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // 🔹 Lock body scroll on mobile menu open
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'auto'
+  }, [isMobileMenuOpen])
 
   const menuItems = user
     ? [
@@ -59,10 +66,9 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
           : 'bg-white'
       }`}
     >
-      {/* 🔹 MAIN NAVBAR ROW */}
+      {/* 🔹 MAIN NAVBAR */}
       <div className="flex items-center justify-between h-20 px-4 md:px-6">
-
-        {/* 🔹 LEFT: BIS LOGO + TITLE (TIGHT TO EDGE) */}
+        {/* LEFT LOGO */}
         <div className="flex items-center gap-3">
           <img
             src={bisLogo}
@@ -73,13 +79,11 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
             <h1 className="text-lg md:text-xl font-bold text-gray-900">
               Standardthon
             </h1>
-            <p className="text-xs text-gray-600">
-              BIS × NIT Hamirpur
-            </p>
+            <p className="text-xs text-gray-600">BIS × NIT Hamirpur</p>
           </div>
         </div>
 
-        {/* 🔹 CENTER MENU */}
+        {/* DESKTOP MENU */}
         <div className="hidden md:flex items-center space-x-2">
           {menuItems.map((item) => (
             <button
@@ -96,7 +100,7 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
           ))}
         </div>
 
-        {/* 🔹 RIGHT: AUTH BUTTON + NIT LOGO (NO OVERFLOW GUARANTEE) */}
+        {/* DESKTOP RIGHT */}
         <div className="hidden md:flex items-center gap-4">
           {user ? (
             <button
@@ -114,7 +118,6 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
             </button>
           )}
 
-          {/* 🔹 HARD-CONSTRAINED NIT LOGO */}
           <div className="h-12 w-12 flex items-center justify-center overflow-hidden">
             <img
               src={collegeLogo}
@@ -124,7 +127,7 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
           </div>
         </div>
 
-        {/* 🔹 MOBILE MENU BUTTON */}
+        {/* MOBILE TOGGLE */}
         <button
           className="md:hidden p-2 rounded-lg hover:bg-gray-100"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -133,7 +136,53 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
         </button>
       </div>
 
-      {/* 🔹 SCROLL PROGRESS BAR */}
+      {/* 🔹 MOBILE MENU */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white border-t shadow-lg">
+          <div className="flex flex-col px-4 py-4 space-y-2">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  onNavigate(item.id)
+                  setIsMobileMenuOpen(false)
+                }}
+                className={`w-full text-left px-4 py-3 rounded-lg font-medium ${
+                  currentView === item.id
+                    ? 'bg-[#34a1eb] text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+
+            {user ? (
+              <button
+                onClick={() => {
+                  signOut()
+                  setIsMobileMenuOpen(false)
+                }}
+                className="mt-2 px-4 py-3 bg-[#9c371e] text-white rounded-lg font-medium"
+              >
+                Sign Out
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  onNavigate('auth')
+                  setIsMobileMenuOpen(false)
+                }}
+                className="mt-2 px-4 py-3 bg-[#34a1eb] text-white rounded-lg font-medium"
+              >
+                Login / Register
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 🔹 SCROLL BAR */}
       <div className="absolute bottom-0 left-0 w-full h-[3px]">
         <div
           className="h-full bg-gradient-to-r from-[#34a1eb] to-[#9c371e]"
