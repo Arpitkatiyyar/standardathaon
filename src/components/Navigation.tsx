@@ -118,7 +118,7 @@ export default function Navigation({ onNavigate, currentView }: NavigationProps)
             </button>
           )}
 
-          <div className="h-12 w-12 flex items-center justify-center overflow-hidden">
+          <div className="h-12 w-12 flex items-center justify-center overflow-hidden flex-shrink-0">
             <img
               src={collegeLogo}
               alt="NIT Hamirpur Logo"

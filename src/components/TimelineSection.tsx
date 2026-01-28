@@ -1,8 +1,10 @@
-
 import { Calendar, CheckCircle2, Flag, Trophy, Users } from 'lucide-react'
 import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 
 export default function TimelineSection() {
+  const sectionRef = useRef<HTMLDivElement | null>(null)
+
   const timelineEvents = [
     { icon: Calendar, title: 'Registration Opens', date: 'March 1, 2024', description: 'Start your journey by registering for the hackathon', accent: '#34a1eb' },
     { icon: CheckCircle2, title: 'Problem Statements Release', date: 'March 10, 2024', description: 'Choose from diverse problem statements across various domains', accent: '#9c371e' },
@@ -12,23 +14,28 @@ export default function TimelineSection() {
     { icon: Trophy, title: 'Results & Closing Ceremony', date: 'March 25, 2024', description: 'Winner announcements and prize distribution', accent: '#9c371e' },
   ]
 
-  const { scrollYProgress } = useScroll()
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start 25%', 'end 75%'],
+  })
+
   const lineFill = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
 
   return (
-    <section className="relative py-24 bg-gradient-to-b from-[#f4f9ff] via-[#fafbfd] to-[#fff1eb] overflow-hidden">
-      {/* Soft background glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_#34a1eb33,_transparent_50%),radial-gradient(circle_at_bottom,_#9c371e33,_transparent_50%)]" />
+    <section
+      ref={sectionRef}
+      className="relative py-24 bg-gradient-to-b from-[#f9fbfd] via-[#ffffff] to-[#f9fbfd] overflow-hidden"
+    >
+      {/* subtle background glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_#00000008,_transparent_60%),radial-gradient(circle_at_bottom,_#00000008,_transparent_60%)]" />
 
       <div className="relative max-w-6xl mx-auto px-4">
+        {/* Heading */}
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Hackathon Timeline
           </h2>
-
-          {/* Smaller underline */}
           <div className="mx-auto w-32 h-[3px] bg-gradient-to-r from-[#34a1eb] to-[#9c371e] rounded-full" />
-
           <p className="mt-6 text-xl text-gray-600">
             Mark your calendars for these important dates
           </p>
@@ -41,7 +48,9 @@ export default function TimelineSection() {
           {/* Animated fill */}
           <motion.div
             style={{ height: lineFill }}
-            className="hidden md:block absolute left-1/2 -translate-x-1/2 w-[3px] bg-gradient-to-b from-[#34a1eb] via-[#9c371e] to-[#34a1eb] origin-top"
+            className="hidden md:block absolute left-1/2 -translate-x-1/2 w-[3px]
+              bg-gradient-to-b from-[#34a1eb] via-[#9c371e] to-[#34a1eb]
+              origin-top"
           />
 
           <div className="space-y-20">
@@ -56,27 +65,20 @@ export default function TimelineSection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-100px' }}
                   transition={{ duration: 0.8, ease: 'easeOut' }}
-                  className={`relative flex items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} flex-col`}
+                  className={`relative flex items-center ${
+                    isEven ? 'md:flex-row' : 'md:flex-row-reverse'
+                  } flex-col`}
                 >
                   {/* Card */}
                   <div className={`w-full md:w-5/12 ${isEven ? 'md:pr-4 md:text-right' : 'md:pl-4 md:text-left'}`}>
                     <motion.div
-                      initial={{ backgroundPosition: '0% 50%' }}
-                      whileInView={{ backgroundPosition: '100% 50%' }}
-                      transition={{ duration: 1.2, ease: 'easeOut' }}
+                      initial={{ opacity: 0.9 }}
+                      whileInView={{ opacity: 1 }}
+                      transition={{ duration: 0.6 }}
                       viewport={{ once: true }}
-                      className="relative rounded-2xl p-7 shadow-xl border border-gray-100 bg-[linear-gradient(120deg,#ffffff_25%,#d9ecff_65%,#ffd6c9_100%)] bg-[length:200%_200%]"
+                      className="relative rounded-2xl p-7 shadow-lg border border-gray-200
+                        bg-gradient-to-br from-gray-50 via-white to-gray-100"
                     >
-                      {/* Color spill */}
-                      <motion.div
-                        initial={{ scaleX: 0 }}
-                        whileInView={{ scaleX: 1 }}
-                        transition={{ duration: 0.8, ease: 'easeOut' }}
-                        viewport={{ once: true }}
-                        className="absolute inset-0 rounded-2xl origin-left"
-                        style={{ background: `linear-gradient(120deg, ${event.accent}88, ${event.accent}44, transparent 65%)` }}
-                      />
-
                       <div className="relative">
                         <div className="flex items-center gap-4 mb-4">
                           <div

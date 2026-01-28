@@ -1,7 +1,7 @@
-import bisLogo from '../assets/bis logo.png'
+import bisLogo from "../assets/bis logo.png";
 
 interface FooterProps {
-  onNavigate: (section: string) => void
+  onNavigate: (section: string) => void;
 }
 
 export default function Footer({ onNavigate }: FooterProps) {
@@ -16,14 +16,14 @@ export default function Footer({ onNavigate }: FooterProps) {
                 {/* <div className="w-12 h-12 bg-gradient-to-br from-[#34a1eb] to-[#9c371e] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                   BI S
                 </div> */}
-                 <img
+                <img
                   src={bisLogo}
                   alt="BIS Logo"
                   className="h-12 md:h-14 w-auto object-contain"
-                  />
+                />
                 <div>
-                  <h3 className="font-bold text-lg">BIS × NIT Hamirpur</h3>
-                  <p className="text-gray-400 text-sm">Hackathon 2024</p>
+                  <h3 className="font-bold text-lg">Standardthon</h3>
+                  <p className="text-gray-400 text-sm">BIS × NIT Hamirpur</p>
                 </div>
               </div>
               <p className="text-gray-400 text-sm">
@@ -36,12 +36,12 @@ export default function Footer({ onNavigate }: FooterProps) {
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
                 {[
-                  { id: 'home', label: 'Home' },
-                  { id: 'about', label: 'About' },
-                  { id: 'timeline', label: 'Timeline' },
-                  { id: 'eligibility', label: 'Eligibility' },
-                  { id: 'members', label: 'Members' },
-                  { id: 'problems', label: 'Problems' },
+                  { id: "home", label: "Home" },
+                  { id: "about", label: "About" },
+                  { id: "timeline", label: "Timeline" },
+                  { id: "eligibility", label: "Eligibility" },
+                  { id: "members", label: "Members" },
+                  { id: "problems", label: "Problems" },
                 ].map((item) => (
                   <li key={item.id}>
                     <button
@@ -68,10 +68,11 @@ export default function Footer({ onNavigate }: FooterProps) {
           </div>
 
           <div className="border-t border-gray-800 pt-6 text-center text-gray-400 text-sm">
-            © 2024 Bureau of Indian Standards × NIT Hamirpur. All rights reserved.
+            © 2024 Bureau of Indian Standards × NIT Hamirpur. All rights
+            reserved.
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
