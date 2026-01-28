@@ -7,11 +7,11 @@ export default function Eligibility() {
         {/* Heading */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Eligibility Criteria
+            Guidelines
           </h2>
           <div className="mx-auto w-32 h-[3px] bg-gradient-to-r from-[#34a1eb] to-[#9c371e] rounded-full" />
           <p className="mt-6 text-xl text-gray-600">
-            Who can participate in the BIS × NIT Hamirpur Hackathon
+            Who can participate in the Standardathon
           </p>
         </div>
 
@@ -24,7 +24,7 @@ export default function Eligibility() {
                 <GraduationCap size={22} />
               </div>
               <h3 className="text-2xl font-semibold text-gray-900">
-                General Eligibility
+                General Guidelines
               </h3>
             </div>
 
@@ -32,7 +32,7 @@ export default function Eligibility() {
               <li className="flex gap-3">
                 <CheckCircle2 className="text-[#34a1eb]" size={20} />
                 <span>
-                  Open to <strong>undergraduate, postgraduate, and diploma</strong> students.
+                  Open <strong> for 2nd, 3rd and Final Year </strong> students.
                 </span>
               </li>
 
@@ -43,10 +43,24 @@ export default function Eligibility() {
                 </span>
               </li>
 
+               <li className="flex gap-3">
+                <CheckCircle2 className="text-[#34a1eb]" size={35} />
+                <span>
+                  All participants must follow the <strong> rules, timelines, and instructions </strong> provided by the organizing committee.
+                </span>
+              </li>
+
               <li className="flex gap-3">
                 <CheckCircle2 className="text-[#34a1eb]" size={20} />
                 <span>
-                  Participants must be enrolled in a <strong>recognized institution</strong>.
+                  Any violation of guidelines may lead to disqualification.
+                </span>
+              </li>
+              
+              <li className="flex gap-3">
+                <CheckCircle2 className="text-[#34a1eb]" size={20} />
+                <span>
+                  Participants must be from <strong>NIT Hamirpur</strong>.
                 </span>
               </li>
             </ul>
@@ -67,22 +81,21 @@ export default function Eligibility() {
               <li className="flex gap-3">
                 <CheckCircle2 className="text-[#9c371e]" size={20} />
                 <span>
-                  Teams must consist of <strong>2 to 4 members</strong>.
+                  Teams must consist of <strong>3 to 5 members</strong>.
                 </span>
               </li>
-
+                
               <li className="flex gap-3">
-                <CheckCircle2 className="text-[#9c371e]" size={20} />
+                <CheckCircle2 className="text-[#9c371e]" size={35} />
                 <span>
                   Each team must include <strong>at least 2 members</strong> from
-                  <strong> Mechanical, Civil, or Chemical Engineering</strong>.
+                  <strong> Mechanical, Civil,Electrical or Electronics Department</strong>.
                 </span>
               </li>
-
               <li className="flex gap-3">
-                <CheckCircle2 className="text-[#9c371e]" size={20} />
+                <CheckCircle2 className="text-[#9c371e]" size={25} />
                 <span>
-                  Remaining team members can belong to <strong>any department</strong>.
+                  Preference will be given to teams that include <strong> at least 1 BIS student member</strong>.
                 </span>
               </li>
             </ul>
@@ -111,4 +124,4 @@ export default function Eligibility() {
     </section>
   )
 }
-
+ 

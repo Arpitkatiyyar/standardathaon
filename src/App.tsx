@@ -383,7 +383,9 @@ function AppRoutes() {
         </Routes>
       </div>
 
-      <Footer />
+      <Footer onNavigate={function (section: string): void {
+        throw new Error('Function not implemented.')
+      } } />
     </div>
   )
 }
