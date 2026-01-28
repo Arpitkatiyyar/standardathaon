@@ -1,3 +1,5 @@
+import bisLogo from '../assets/bis logo.png'
+
 interface FooterProps {
   onNavigate: (section: string) => void
 }
@@ -11,9 +13,14 @@ export default function Footer({ onNavigate }: FooterProps) {
             {/* BRAND */}
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#34a1eb] to-[#9c371e] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                  BIS
-                </div>
+                {/* <div className="w-12 h-12 bg-gradient-to-br from-[#34a1eb] to-[#9c371e] rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                  BI S
+                </div> */}
+                 <img
+                  src={bisLogo}
+                  alt="BIS Logo"
+                  className="h-12 md:h-14 w-auto object-contain"
+                  />
                 <div>
                   <h3 className="font-bold text-lg">BIS × NIT Hamirpur</h3>
                   <p className="text-gray-400 text-sm">Hackathon 2024</p>
