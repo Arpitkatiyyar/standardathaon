@@ -1,262 +1,399 @@
-import { useEffect, useRef } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Navigation from './components/Navigation';
-import HeroSection from './components/HeroSection';
-import AboutSection from './components/AboutSection';
-import TimelineSection from './components/TimelineSection';
-import ProblemsSection from './components/ProblemsSection';
-import AuthForms from './components/AuthForms';
-import Dashboard from './components/Dashboard';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+// import { useEffect, useRef } from 'react'
+// import { AuthProvider, useAuth } from './contexts/AuthContext'
+// import Navigation from './components/Navigation'
+// import HeroSection from './components/HeroSection'
+// import AboutSection from './components/AboutSection'
+// import TimelineSection from './components/TimelineSection'
+// import Eligibility from './components/Eligibility'
+// import Members from './components/Members'
+// import ProblemsSection from './components/ProblemsSection'
+// import FAQ from './components/Faq'
+// import AuthForms from './components/AuthForms'
+// import Dashboard from './components/Dashboard'
+// import Footer from './components/Footer'
+// import {
+//   BrowserRouter,
+//   Routes,
+//   Route,
+//   Navigate,
+//   useLocation,
+//   useNavigate,
+// } from 'react-router-dom'
 
-function HomePage({ onNavigate }: { onNavigate: (section: string) => void }) {
-  const location = useLocation();
-  const navigate = useNavigate();
+// function HomePage({ onNavigate }: { onNavigate: (section: string) => void }) {
+//   const location = useLocation()
 
-  const homeRef = useRef<HTMLDivElement | null>(null);
-  const aboutRef = useRef<HTMLDivElement | null>(null);
-  const timelineRef = useRef<HTMLDivElement | null>(null);
-  const problemsRef = useRef<HTMLDivElement | null>(null);
+//   const homeRef = useRef<HTMLDivElement | null>(null)
+//   const aboutRef = useRef<HTMLDivElement | null>(null)
+//   const timelineRef = useRef<HTMLDivElement | null>(null)
+//   const eligibilityRef = useRef<HTMLDivElement | null>(null)
+//   const membersRef = useRef<HTMLDivElement | null>(null)
+//   const problemsRef = useRef<HTMLDivElement | null>(null)
+//   const faqRef = useRef<HTMLDivElement | null>(null)
 
-  // Disable automatic scroll restoration so reloads don't jump to mid page
+//   // Disable browser scroll restoration
+//   useEffect(() => {
+//     if ('scrollRestoration' in history) {
+//       history.scrollRestoration = 'manual'
+//     }
+//     if (location.pathname === '/') {
+//       window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+//     }
+//   }, [])
+
+//   // Scroll to section on route change
+//   useEffect(() => {
+//     const targetByPath: Record<string, HTMLElement | null | undefined> = {
+//       '/': homeRef.current,
+//       '/about': aboutRef.current,
+//       '/timeline': timelineRef.current,
+//       '/eligibility': eligibilityRef.current,
+//       '/members': membersRef.current,
+//       '/problems': problemsRef.current,
+//       '/faq': faqRef.current,
+//     }
+
+//     const el = targetByPath[location.pathname]
+//     if (el) {
+//       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+//     }
+//   }, [location.pathname])
+
+//   return (
+//     <>
+//       <div ref={homeRef} id="home" className="min-h-screen scroll-mt-24">
+//         <HeroSection onNavigate={onNavigate} />
+//       </div>
+
+//       <div ref={aboutRef} id="about" className="min-h-screen scroll-mt-24">
+//         <AboutSection />
+//       </div>
+
+//       <div ref={timelineRef} id="timeline" className="min-h-screen scroll-mt-24">
+//         <TimelineSection />
+//       </div>
+
+//       <div ref={eligibilityRef} id="eligibility" className="min-h-screen scroll-mt-24">
+//         <Eligibility />
+//       </div>
+
+//       <div ref={membersRef} id="members" className="min-h-screen scroll-mt-24">
+//         <Members />
+//       </div>
+
+//       <div ref={problemsRef} id="problems" className="min-h-screen scroll-mt-24">
+//         <ProblemsSection />
+//       </div>
+
+//       <div ref={faqRef} id="faq" className="min-h-screen scroll-mt-24">
+//         <FAQ />
+//       </div>
+//     </>
+//   )
+// }
+
+// function AppRoutes() {
+//   const { loading } = useAuth()
+//   const location = useLocation()
+//   const navigate = useNavigate()
+
+//   const pathToView: Record<string, string> = {
+//     '/': 'home',
+//     '/about': 'about',
+//     '/timeline': 'timeline',
+//     '/eligibility': 'eligibility',
+//     '/members': 'members',
+//     '/problems': 'problems',
+//     '/faq': 'faq',
+//     '/auth': 'auth',
+//     '/dashboard': 'dashboard',
+//   }
+
+//   const currentView = pathToView[location.pathname] ?? 'home'
+
+//   const handleNavigate = (section: string) => {
+//     const viewToPath: Record<string, string> = {
+//       home: '/',
+//       about: '/about',
+//       timeline: '/timeline',
+//       eligibility: '/eligibility',
+//       members: '/members',
+//       problems: '/problems',
+//       faq: '/faq',
+//       auth: '/auth',
+//       dashboard: '/dashboard',
+//     }
+//     navigate(viewToPath[section] ?? '/')
+//   }
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#34a1eb]/10 to-[#9c371e]/10">
+//         <div className="w-16 h-16 border-4 border-[#34a1eb] border-t-transparent rounded-full animate-spin" />
+//       </div>
+//     )
+//   }
+
+//   return (
+//     <div className="min-h-screen bg-white flex flex-col">
+//       <Navigation onNavigate={handleNavigate} currentView={currentView} />
+
+//       <div className="flex-1">
+//         <Routes>
+//           <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
+//           <Route path="/about" element={<HomePage onNavigate={handleNavigate} />} />
+//           <Route path="/timeline" element={<HomePage onNavigate={handleNavigate} />} />
+//           <Route path="/eligibility" element={<HomePage onNavigate={handleNavigate} />} />
+//           <Route path="/members" element={<HomePage onNavigate={handleNavigate} />} />
+//           <Route path="/problems" element={<HomePage onNavigate={handleNavigate} />} />
+//           <Route path="/faq" element={<HomePage onNavigate={handleNavigate} />} />
+//           <Route path="/auth" element={<AuthForms onNavigate={handleNavigate} />} />
+//           <Route path="/dashboard" element={<Dashboard />} />
+//           <Route path="*" element={<Navigate to="/" replace />} />
+//         </Routes>
+//       </div>
+
+//       <Footer />
+//     </div>
+//   )
+// }
+
+// export default function App() {
+//   return (
+//     <AuthProvider>
+//       <BrowserRouter>
+//         <AppRoutes />
+//       </BrowserRouter>
+//     </AuthProvider>
+//   )
+// }
+import { useEffect, useRef } from 'react'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
+import Navigation from './components/Navigation'
+import HeroSection from './components/HeroSection'
+import AboutSection from './components/AboutSection'
+import TimelineSection from './components/TimelineSection'
+import Eligibility from './components/Eligibility'
+import Members from './components/Members'
+import ProblemsSection from './components/ProblemsSection'
+import FAQ from './components/Faq'
+import AuthForms from './components/AuthForms'
+import Dashboard from './components/Dashboard'
+import Footer from './components/Footer'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
+
+function HomePage({
+  onNavigate,
+  onSectionChange,
+}: {
+  onNavigate: (section: string) => void
+  onSectionChange: (section: string) => void
+}) {
+  const location = useLocation()
+
+  const homeRef = useRef<HTMLDivElement | null>(null)
+  const aboutRef = useRef<HTMLDivElement | null>(null)
+  const timelineRef = useRef<HTMLDivElement | null>(null)
+  const eligibilityRef = useRef<HTMLDivElement | null>(null)
+  const membersRef = useRef<HTMLDivElement | null>(null)
+  const problemsRef = useRef<HTMLDivElement | null>(null)
+  const faqRef = useRef<HTMLDivElement | null>(null)
+
   useEffect(() => {
-    const hasRestoration = 'scrollRestoration' in history;
-    const prev = (hasRestoration && (history as any).scrollRestoration) || 'auto';
-    if (hasRestoration) {
-      (history as any).scrollRestoration = 'manual';
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
     }
-    // Ensure when landing on home (/) we start at the top
     if (location.pathname === '/') {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
     }
-    return () => {
-      if (hasRestoration) {
-        (history as any).scrollRestoration = prev;
-      }
-    };
-  }, []);
+  }, [])
 
-  // Scroll to the section based on current path
   useEffect(() => {
     const targetByPath: Record<string, HTMLElement | null | undefined> = {
       '/': homeRef.current,
       '/about': aboutRef.current,
       '/timeline': timelineRef.current,
+      '/eligibility': eligibilityRef.current,
+      '/members': membersRef.current,
       '/problems': problemsRef.current,
-    };
-    const el = targetByPath[location.pathname];
-    if (el) {
-      // Smooth scroll to section and apply small offset for fixed navbar
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // After the smooth scroll completes, nudge up by navbar height for non-home sections
-      setTimeout(() => {
-        try {
-          if (location.pathname !== '/') {
-            window.scrollBy(0, -96);
-          }
-        } catch {}
-      }, 400);
+      '/faq': faqRef.current,
     }
-  }, [location.pathname]);
 
-  // Update URL based on scroll position (choose section whose top is closest to navbar)
+    const el = targetByPath[location.pathname]
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [location.pathname])
+
   useEffect(() => {
-    const NAV_OFFSET = 96;
     const sections = [
-      { path: '/', el: homeRef.current as HTMLElement | null },
-      { path: '/about', el: aboutRef.current as HTMLElement | null },
-      { path: '/timeline', el: timelineRef.current as HTMLElement | null },
-      { path: '/problems', el: problemsRef.current as HTMLElement | null },
-    ];
+      homeRef,
+      aboutRef,
+      timelineRef,
+      eligibilityRef,
+      membersRef,
+      problemsRef,
+      faqRef,
+    ]
 
-    const computeCurrent = () => {
-      // If near very top, keep Home selected
-      if (window.scrollY <= 120) return '/';
-      const distances = sections
-        .filter((s) => s.el)
-        .map((s) => ({
-          path: s.path,
-          top: (s.el as HTMLElement).getBoundingClientRect().top - NAV_OFFSET,
-        }));
-      // Choose the section whose top is closest to the navbar line
-      const candidate = distances.sort((a, b) => Math.abs(a.top) - Math.abs(b.top))[0];
-      return candidate?.path;
-    };
-
-    let timeoutId: number | null = null;
-    const onScroll = () => {
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            onSectionChange(entry.target.id)
+          }
+        })
+      },
+      {
+        rootMargin: '-45% 0px -45% 0px',
+        threshold: 0,
       }
-      timeoutId = window.setTimeout(() => {
-        const curPath = computeCurrent();
-        if (!curPath) return;
-        if (location.pathname !== curPath) {
-          navigate(curPath, { replace: true });
-        }
-      }, 100);
-    };
+    )
 
-    // Sync once and on scroll
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [navigate, location.pathname]);
+    sections.forEach(
+      (ref) => ref.current && observer.observe(ref.current)
+    )
+
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <>
-      <div id="home" ref={homeRef} className="min-h-screen pt-20 animate-slide-up">
+      <div ref={homeRef} id="home" className="min-h-screen scroll-mt-24">
         <HeroSection onNavigate={onNavigate} />
       </div>
-      <div id="about" ref={aboutRef} className="min-h-screen pt-20 animate-slide-up">
+
+      <div ref={aboutRef} id="about" className="min-h-screen scroll-mt-24">
         <AboutSection />
       </div>
-      <div id="timeline" ref={timelineRef} className="min-h-screen pt-20 animate-slide-up">
+
+      <div ref={timelineRef} id="timeline" className="min-h-screen scroll-mt-24">
         <TimelineSection />
       </div>
-      <div id="problems" ref={problemsRef} className="min-h-screen pt-20 animate-slide-up">
+
+      <div ref={eligibilityRef} id="eligibility" className="min-h-screen scroll-mt-24">
+        <Eligibility />
+      </div>
+
+      <div ref={membersRef} id="members" className="min-h-screen scroll-mt-24">
+        <Members />
+      </div>
+
+      <div ref={problemsRef} id="problems" className="min-h-screen scroll-mt-24">
         <ProblemsSection />
       </div>
+
+      <div ref={faqRef} id="faq" className="min-h-screen scroll-mt-24">
+        <FAQ />
+      </div>
     </>
-  );
+  )
 }
 
 function AppRoutes() {
-  const { loading } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
+  // ✅ CHANGE 1: get user also
+  const { loading, user } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const pathToView: Record<string, string> = {
     '/': 'home',
     '/about': 'about',
     '/timeline': 'timeline',
+    '/eligibility': 'eligibility',
+    '/members': 'members',
     '/problems': 'problems',
+    '/faq': 'faq',
     '/auth': 'auth',
     '/dashboard': 'dashboard',
-  };
+  }
 
-  const currentView = pathToView[location.pathname] ?? 'home';
-
-  useEffect(() => {
-    if (currentView === 'home') {
-      document.title = 'BIS × NIT Hamirpur Hackathon 2024';
-    } else {
-      document.title = `${currentView.charAt(0).toUpperCase() + currentView.slice(1)} | BIS × NIT Hamirpur`;
-    }
-  }, [currentView]);
+  const currentView = pathToView[location.pathname] ?? 'home'
 
   const handleNavigate = (section: string) => {
     const viewToPath: Record<string, string> = {
       home: '/',
       about: '/about',
       timeline: '/timeline',
+      eligibility: '/eligibility',
+      members: '/members',
       problems: '/problems',
+      faq: '/faq',
       auth: '/auth',
       dashboard: '/dashboard',
-    };
-    navigate(viewToPath[section] ?? '/');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    }
+
+    navigate(viewToPath[section] ?? '/', {
+      replace: true,
+      preventScrollReset: true,
+    })
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#34a1eb]/10 to-[#9c371e]/10">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#34a1eb] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Loading...</p>
-        </div>
+        <div className="w-16 h-16 border-4 border-[#34a1eb] border-t-transparent rounded-full animate-spin" />
       </div>
-    );
+    )
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Navigation onNavigate={handleNavigate} currentView={currentView} />
 
-      <Routes>
-        <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
-        <Route path="/about" element={<HomePage onNavigate={handleNavigate} />} />
-        <Route path="/timeline" element={<HomePage onNavigate={handleNavigate} />} />
-        <Route path="/problems" element={<HomePage onNavigate={handleNavigate} />} />
-        <Route path="/auth" element={<AuthForms onNavigate={handleNavigate} />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <div className="flex-1">
+        <Routes>
+          {['/', '/about', '/timeline', '/eligibility', '/members', '/problems', '/faq'].map(
+            (path) => (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  <HomePage
+                    onNavigate={handleNavigate}
+                    onSectionChange={handleNavigate}
+                  />
+                }
+              />
+            )
+          )}
 
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-8 mb-8">
-              <div>
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#34a1eb] to-[#9c371e] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                    BIS
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">BIS × NIT Hamirpur</h3>
-                    <p className="text-gray-400 text-sm">Hackathon 2024</p>
-                  </div>
-                </div>
-                <p className="text-gray-400 text-sm">
-                  Innovation meets standards excellence in this collaborative hackathon initiative.
-                </p>
-              </div>
+          <Route path="/auth" element={<AuthForms onNavigate={handleNavigate} />} />
 
-              <div>
-                <h4 className="font-semibold mb-4">Quick Links</h4>
-                <ul className="space-y-2 text-gray-400">
-                  <li>
-                    <button onClick={() => handleNavigate('home')} className="hover:text-white transition-colors">
-                      Home
-                    </button>
-                  </li>
-                  <li>
-                    <button onClick={() => handleNavigate('about')} className="hover:text-white transition-colors">
-                      About
-                    </button>
-                  </li>
-                  <li>
-                    <button onClick={() => handleNavigate('timeline')} className="hover:text-white transition-colors">
-                      Timeline
-                    </button>
-                  </li>
-                  <li>
-                    <button onClick={() => handleNavigate('problems')} className="hover:text-white transition-colors">
-                      Problem Statements
-                    </button>
-                  </li>
-                </ul>
-              </div>
+          {/* ✅ CHANGE 2: protect dashboard */}
+          <Route
+            path="/dashboard"
+            element={
+              user && user.email_confirmed_at ? (
+                <Dashboard />
+              ) : (
+                <Navigate to="/auth" replace />
+              )
+            }
+          />
 
-              <div>
-                <h4 className="font-semibold mb-4">Contact</h4>
-                <ul className="space-y-2 text-gray-400 text-sm">
-                  <li>Bureau of Indian Standards</li>
-                  <li>Manak Bhavan, New Delhi</li>
-                  <li className="pt-4">NIT Hamirpur</li>
-                  <li>Hamirpur, Himachal Pradesh</li>
-                </ul>
-              </div>
-            </div>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
 
-            <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-              <p>&copy; 2024 Bureau of Indian Standards × NIT Hamirpur. All rights reserved.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
-  );
+  )
 }
 
-function App() {
+export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
-  );
+  )
 }
-
-export default App;
