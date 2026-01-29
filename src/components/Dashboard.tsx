@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { User, Users, Copy, Check, Plus, LogIn, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,17 +9,13 @@ interface Team {
   name: string;
   team_code: string;
   leader_id: string;
-  problem_statement_id: string | null;
-  member_count: number;
-  problem_statement?: {
-    title: string;
-    domain: string;
-  };
+  created_at: string;
 }
 
 interface TeamMember {
   id: string;
   user_id: string;
+  role: string;
   profiles: {
     full_name: string;
     email: string;
@@ -56,34 +53,65 @@ export default function Dashboard() {
     if (!profile?.team_id) return;
 
     try {
+      // Fetch team data
       const { data: teamData, error: teamError } = await supabase
         .from('teams')
-        .select(`
-          *,
-          problem_statement:problem_statements(title, domain)
-        `)
+        .select('*')
         .eq('id', profile.team_id)
         .maybeSingle();
 
       if (teamError) throw teamError;
       setTeam(teamData);
 
+      // Fetch team members
       const { data: membersData, error: membersError } = await supabase
         .from('team_members')
-        .select(`
-          id,
-          user_id,
-          profiles(full_name, email)
-        `)
+        .select('id, user_id, role')
         .eq('team_id', profile.team_id);
 
       if (membersError) throw membersError;
-      setTeamMembers(membersData || []);
+
+      // Fetch profiles for each member
+      if (membersData && membersData.length > 0) {
+        const userIds = membersData.map(m => m.user_id);
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', userIds);
+
+        if (profilesError) throw profilesError;
+
+        // Combine members with their profiles
+        const combinedData = membersData.map(member => {
+          const userProfile = profilesData?.find(p => p.id === member.user_id);
+          return {
+            ...member,
+            profiles: {
+              full_name: userProfile?.full_name || 'Unknown',
+              email: userProfile?.email || 'Unknown'
+            }
+          };
+        });
+
+        setTeamMembers(combinedData);
+      } else {
+        setTeamMembers([]);
+      }
     } catch (error) {
       console.error('Error fetching team:', error);
+      setError('Failed to fetch team data');
     } finally {
       setLoading(false);
     }
+  };
+
+  const generateTeamCode = (): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
   };
 
   const createTeam = async () => {
@@ -100,12 +128,13 @@ export default function Dashboard() {
     setError('');
 
     try {
-      const teamCode = await generateTeamCode();
+      const teamCode = generateTeamCode();
 
+      // Create the team
       const { data: newTeam, error: teamError } = await supabase
         .from('teams')
         .insert({
-          name: teamName,
+          name: teamName.trim(),
           team_code: teamCode,
           leader_id: user!.id,
         })
@@ -114,36 +143,40 @@ export default function Dashboard() {
 
       if (teamError) throw teamError;
 
-      await supabase
+      // Add creator as team member with leader role
+      const { error: memberError } = await supabase
         .from('team_members')
         .insert({
           team_id: newTeam.id,
           user_id: user!.id,
+          role: 'leader',
         });
 
-      await supabase
+      if (memberError) throw memberError;
+
+      // Update user profile with team_id
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({ team_id: newTeam.id })
         .eq('id', user!.id);
+
+      if (profileError) throw profileError;
 
       await refreshProfile();
       setSuccess('Team created successfully!');
       setShowCreateTeam(false);
       setTeamName('');
       fetchTeamData();
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error creating team:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create team');
+      if (error.code === '23505') {
+        setError('A team with this name already exists. Please choose a different name.');
+      } else {
+        setError(error.message || 'Failed to create team');
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  const generateTeamCode = async (): Promise<string> => {
-    if (!isSupabaseConfigured) throw new Error('Supabase is not configured');
-    const { data, error } = await supabase.rpc('generate_team_code');
-    if (error) throw error;
-    return data;
   };
 
   const joinTeam = async () => {
@@ -160,9 +193,10 @@ export default function Dashboard() {
     setError('');
 
     try {
+      // Find team by code
       const { data: existingTeam, error: findError } = await supabase
         .from('teams')
-        .select('id, member_count')
+        .select('id')
         .eq('team_code', joinCode.toUpperCase())
         .maybeSingle();
 
@@ -173,37 +207,50 @@ export default function Dashboard() {
         return;
       }
 
-      if (existingTeam.member_count >= 4) {
+      // Check current team size
+      const { data: currentMembers, error: countError } = await supabase
+        .from('team_members')
+        .select('id')
+        .eq('team_id', existingTeam.id);
+
+      if (countError) throw countError;
+      if (currentMembers && currentMembers.length >= 4) {
         setError('This team is already full (max 4 members)');
         setLoading(false);
         return;
       }
 
-      await supabase
+      // Add user to team
+      const { error: memberError } = await supabase
         .from('team_members')
         .insert({
           team_id: existingTeam.id,
           user_id: user!.id,
+          role: 'member',
         });
 
-      await supabase
-        .from('teams')
-        .update({ member_count: existingTeam.member_count + 1 })
-        .eq('id', existingTeam.id);
+      if (memberError) throw memberError;
 
-      await supabase
+      // Update user profile
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({ team_id: existingTeam.id })
         .eq('id', user!.id);
+
+      if (profileError) throw profileError;
 
       await refreshProfile();
       setSuccess('Successfully joined the team!');
       setShowJoinTeam(false);
       setJoinCode('');
       fetchTeamData();
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error joining team:', error);
-      setError(error instanceof Error ? error.message : 'Failed to join team');
+      if (error.code === '23505') {
+        setError('You are already a member of this team');
+      } else {
+        setError(error.message || 'Failed to join team');
+      }
     } finally {
       setLoading(false);
     }
@@ -221,25 +268,26 @@ export default function Dashboard() {
       return;
     }
 
-    if (!confirm('Are you sure you want to leave this team?')) return;
+    if (!window.confirm('Are you sure you want to leave this team?')) return;
 
     setLoading(true);
     try {
-      await supabase
+      // Remove from team_members
+      const { error: memberError } = await supabase
         .from('team_members')
         .delete()
         .eq('team_id', profile.team_id)
         .eq('user_id', user!.id);
 
-      await supabase
-        .from('teams')
-        .update({ member_count: team.member_count - 1 })
-        .eq('id', profile.team_id);
+      if (memberError) throw memberError;
 
-      await supabase
+      // Update profile
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({ team_id: null })
         .eq('id', user!.id);
+
+      if (profileError) throw profileError;
 
       await refreshProfile();
       setTeam(null);
@@ -260,24 +308,33 @@ export default function Dashboard() {
     }
     if (!team || team.leader_id !== user!.id) return;
 
-    if (!confirm('Are you sure you want to delete this team? This action cannot be undone.')) return;
+    if (!window.confirm('Are you sure you want to delete this team? This action cannot be undone.')) return;
 
     setLoading(true);
     try {
-      await supabase
+      // Update all member profiles
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({ team_id: null })
         .eq('team_id', team.id);
 
-      await supabase
+      if (profileError) throw profileError;
+
+      // Delete all team members
+      const { error: membersError } = await supabase
         .from('team_members')
         .delete()
         .eq('team_id', team.id);
 
-      await supabase
+      if (membersError) throw membersError;
+
+      // Delete the team
+      const { error: teamError } = await supabase
         .from('teams')
         .delete()
         .eq('id', team.id);
+
+      if (teamError) throw teamError;
 
       await refreshProfile();
       setTeam(null);
@@ -329,6 +386,7 @@ export default function Dashboard() {
           )}
 
           <div className="grid md:grid-cols-2 gap-8">
+            {/* Profile Card */}
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-12 h-12 bg-[#34a1eb]/10 rounded-xl flex items-center justify-center">
@@ -361,6 +419,7 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Team Management Card */}
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-12 h-12 bg-[#9c371e]/10 rounded-xl flex items-center justify-center">
@@ -413,7 +472,10 @@ export default function Dashboard() {
                           Create
                         </button>
                         <button
-                          onClick={() => setShowCreateTeam(false)}
+                          onClick={() => {
+                            setShowCreateTeam(false);
+                            setError('');
+                          }}
                           className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all"
                         >
                           Cancel
@@ -441,7 +503,10 @@ export default function Dashboard() {
                           Join
                         </button>
                         <button
-                          onClick={() => setShowJoinTeam(false)}
+                          onClick={() => {
+                            setShowJoinTeam(false);
+                            setError('');
+                          }}
                           className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all"
                         >
                           Cancel
@@ -491,7 +556,7 @@ export default function Dashboard() {
                           <div>
                             <p className="font-semibold text-gray-900">
                               {member.profiles.full_name}
-                              {member.user_id === team.leader_id && (
+                              {member.role === 'leader' && (
                                 <span className="ml-2 px-2 py-1 bg-[#34a1eb] text-white text-xs rounded-full">
                                   Leader
                                 </span>
