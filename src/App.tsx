@@ -11,6 +11,7 @@
 // import FAQ from './components/Faq'
 // import AuthForms from './components/AuthForms'
 // import Dashboard from './components/Dashboard'
+// import Submission from './components/Submission' // ✅ ADDED
 // import Footer from './components/Footer'
 // import {
 //   BrowserRouter,
@@ -40,7 +41,6 @@
 //   const problemsRef = useRef<HTMLDivElement>(null)
 //   const faqRef = useRef<HTMLDivElement>(null)
 
-//   /* ✅ Scroll to section ONLY when URL changes (clicks) */
 //   useEffect(() => {
 //     const map: Record<string, HTMLDivElement | null> = {
 //       '/': homeRef.current,
@@ -58,7 +58,6 @@
 //     }
 //   }, [location.pathname])
 
-//   /* ✅ Scroll observer ONLY updates active section (NO routing) */
 //   useEffect(() => {
 //     const sections = [
 //       homeRef,
@@ -137,6 +136,7 @@
 //     '/faq': 'faq',
 //     '/auth': 'auth',
 //     '/dashboard': 'dashboard',
+//     '/submission': 'submission', // ✅ ADDED
 //   }
 
 //   const currentView =
@@ -155,6 +155,7 @@
 //       faq: '/faq',
 //       auth: '/auth',
 //       dashboard: '/dashboard',
+//       submission: '/submission', // ✅ ADDED
 //     }
 
 //     navigate(map[section] ?? '/', {
@@ -205,6 +206,18 @@
 //             }
 //           />
 
+//           {/* ✅ SUBMISSION ROUTE (ADDED) */}
+//           <Route
+//             path="/submission"
+//             element={
+//               user && user.email_confirmed_at ? (
+//                 <Submission />
+//               ) : (
+//                 <Navigate to="/auth" replace />
+//               )
+//             }
+//           />
+
 //           <Route path="*" element={<Navigate to="/" replace />} />
 //         </Routes>
 //       </div>
@@ -237,7 +250,8 @@ import ProblemsSection from './components/ProblemsSection'
 import FAQ from './components/Faq'
 import AuthForms from './components/AuthForms'
 import Dashboard from './components/Dashboard'
-import Submission from './components/Submission' // ✅ ADDED
+import Submission from './components/Submission'
+import AdminDashboard from './components/AdminDashboard'
 import Footer from './components/Footer'
 import {
   BrowserRouter,
@@ -362,7 +376,8 @@ function AppRoutes() {
     '/faq': 'faq',
     '/auth': 'auth',
     '/dashboard': 'dashboard',
-    '/submission': 'submission', // ✅ ADDED
+    '/submission': 'submission',
+    '/admin': 'admin',
   }
 
   const currentView =
@@ -381,7 +396,8 @@ function AppRoutes() {
       faq: '/faq',
       auth: '/auth',
       dashboard: '/dashboard',
-      submission: '/submission', // ✅ ADDED
+      submission: '/submission',
+      admin: '/admin',
     }
 
     navigate(map[section] ?? '/', {
@@ -432,7 +448,6 @@ function AppRoutes() {
             }
           />
 
-          {/* ✅ SUBMISSION ROUTE (ADDED) */}
           <Route
             path="/submission"
             element={
@@ -440,6 +455,18 @@ function AppRoutes() {
                 <Submission />
               ) : (
                 <Navigate to="/auth" replace />
+              )
+            }
+          />
+
+          {/* 🔐 ADMIN ROUTE (EMAIL-BASED GUARD) */}
+          <Route
+            path="/jadu"
+            element={
+              user && user.email_confirmed_at ? (
+                <AdminDashboard />
+              ) : (
+                <Navigate to="/" replace />
               )
             }
           />

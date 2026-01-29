@@ -1,200 +1,733 @@
+// import { useEffect, useState } from "react";
+// import { supabase } from "../lib/supabase";
+// import { useAuth } from "../contexts/AuthContext";
+
+// const MAX_WORDS = 500;
+
+// export default function Submission() {
+//   const { user, profile, loading } = useAuth();
+
+//   const [submission, setSubmission] = useState<any>(null);
+//   const [pageLoading, setPageLoading] = useState(true);
+
+//   const [problemStatementId, setProblemStatementId] = useState("");
+//   const [driveLink, setDriveLink] = useState("");
+//   const [additionalLink, setAdditionalLink] = useState("");
+//   const [description, setDescription] = useState("");
+//   const [descError, setDescError] = useState("");
+
+//   const wordCount = description.trim().split(/\s+/).filter(Boolean).length;
+
+//   /* ---------------- FETCH SUBMISSION ---------------- */
+//   useEffect(() => {
+//     if (loading) return;
+
+//     if (!profile?.team_id) {
+//       setPageLoading(false);
+//       return;
+//     }
+
+//     const fetchSubmission = async () => {
+//       const { data } = await supabase
+//         .from("submissions")
+//         .select("*")
+//         .eq("team_id", profile.team_id as string)
+//         .maybeSingle();
+
+//       setSubmission(data ?? null);
+//       setPageLoading(false);
+//     };
+
+//     fetchSubmission();
+//   }, [loading, profile?.team_id]);
+
+//   /* ---------------- DELETE SUBMISSION ---------------- */
+//   const handleDeleteSubmission = async () => {
+//     const confirmDelete = window.confirm(
+//       "Are you sure you want to delete this submission? You can submit again after deleting.",
+//     );
+
+//     if (!confirmDelete) return;
+
+//     const { error } = await supabase
+//       .from("submissions")
+//       .delete()
+//       .eq("team_id", profile?.team_id as string);
+
+//     if (error) {
+//       alert(error.message);
+//     } else {
+//       alert("Submission deleted. You can submit again.");
+//       window.location.reload();
+//     }
+//   };
+
+//   /* ---------------- LOADING ---------------- */
+//   if (loading || pageLoading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         <p className="text-gray-600">Loading submission…</p>
+//       </div>
+//     );
+//   }
+
+//   /* ---------------- NO TEAM ---------------- */
+//   if (!profile?.team_id) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center px-4">
+//         <div className="bg-white shadow-xl rounded-2xl p-8 max-w-md text-center">
+//           <h2 className="text-xl font-bold mb-2">No Team Found</h2>
+//           <p className="text-gray-600">
+//             You must join or create a team before submitting your project.
+//           </p>
+//         </div>
+//       </div>
+//     );
+//   }
+//   const normalizeUrl = (url: string) => {
+//     if (!url.startsWith("http://") && !url.startsWith("https://")) {
+//       return `https://${url}`;
+//     }
+//     return url;
+//   };
+
+//   /* ================= ALREADY SUBMITTED ================= */
+//   if (submission) {
+//     return (
+//       <div className="min-h-screen bg-gradient-to-br from-[#34a1eb]/10 via-white to-[#9c371e]/10 py-20 px-4">
+//         <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-3xl p-10 space-y-8">
+//           <h2 className="text-3xl font-bold text-gray-900">
+//             Your Team Submission
+//           </h2>
+
+//           {/* Problem Statement */}
+//           <div>
+//             <p className="text-sm text-gray-500 mb-1">Problem Statement</p>
+//             <p className="text-lg font-semibold text-gray-800">
+//               {submission.problem_statement_id}
+//             </p>
+//           </div>
+
+//           {/* TEXT LINKS — OPEN IN NEW TAB */}
+//           <div className="space-y-4">
+//             <div>
+//               <p className="text-sm text-gray-500 mb-1">Drive Link</p>
+//               <a
+//                 href={normalizeUrl(submission.drive_link)}
+//                 target="_blank"
+//                 rel="noopener noreferrer"
+//                 className="text-[#34a1eb] font-medium underline break-all hover:text-[#2891db]"
+//               >
+//                 {submission.drive_link}
+//               </a>
+//             </div>
+
+//             {submission.additional_link && (
+//               <div>
+//                 <p className="text-sm text-gray-500 mb-1">Additional Link</p>
+//                 <a
+//                   href={normalizeUrl(submission.additional_link)}
+//                   target="_blank"
+//                   rel="noopener noreferrer"
+//                   className="text-[#9c371e] font-medium underline break-all hover:text-[#8a2f19]"
+//                 >
+//                   {submission.additional_link}
+//                 </a>
+//               </div>
+//             )}
+//           </div>
+
+//           {/* Description */}
+//           <div className="bg-gray-50 border rounded-xl p-6">
+//             <p className="text-sm text-gray-500 mb-2">Project Description</p>
+//             <p className="text-gray-800 whitespace-pre-line leading-relaxed">
+//               {submission.description}
+//             </p>
+//           </div>
+
+//           {/* Status + Delete */}
+//           <div className="flex flex-wrap items-center gap-4 pt-4">
+//             <span className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-green-100 text-green-700">
+//               ✅ Submission Completed
+//             </span>
+
+//             <button
+//               onClick={handleDeleteSubmission}
+//               className="text-sm font-medium text-red-600 underline hover:text-red-700"
+//             >
+//               Delete & Update Submission
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   /* ---------------- SUBMIT ---------------- */
+//   const handleSubmit = async () => {
+//     if (!user || !profile?.team_id) return;
+
+//     if (wordCount > MAX_WORDS) {
+//       setDescError("Description must be within 500 words.");
+//       return;
+//     }
+
+//     const { error } = await supabase.from("submissions").insert({
+//       team_id: profile.team_id as string,
+//       team_name: "AUTO",
+//       problem_statement_id: problemStatementId,
+//       drive_link: driveLink,
+//       additional_link: additionalLink || null,
+//       description,
+//       uploaded_by: user.id,
+//     } as any);
+
+//     if (error) {
+//       alert(error.message);
+//     } else {
+//       alert("Submission successful!");
+//       window.location.reload();
+//     }
+//   };
+
+//   /* ---------------- FORM ---------------- */
+//   return (
+//     <div className="min-h-screen bg-gray-50 py-20 px-4">
+//       <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8 space-y-6">
+//         <h2 className="text-2xl font-bold">Project Submission</h2>
+
+//         <input
+//           className="w-full border rounded-lg px-4 py-2"
+//           placeholder="Problem Statement ID"
+//           value={problemStatementId}
+//           onChange={(e) => setProblemStatementId(e.target.value)}
+//         />
+
+//         <input
+//           className="w-full border rounded-lg px-4 py-2"
+//           placeholder="Google Drive Link"
+//           value={driveLink}
+//           onChange={(e) => setDriveLink(e.target.value)}
+//         />
+
+//         <input
+//           className="w-full border rounded-lg px-4 py-2"
+//           placeholder="Additional Link (optional)"
+//           value={additionalLink}
+//           onChange={(e) => setAdditionalLink(e.target.value)}
+//         />
+
+//         {/* Description */}
+//         <div>
+//           <label className="block font-semibold mb-1">
+//             Project Description (max 500 words)
+//           </label>
+//           <textarea
+//             rows={6}
+//             className={`w-full border rounded-lg px-4 py-2 ${
+//               wordCount > MAX_WORDS ? "border-red-500" : ""
+//             }`}
+//             value={description}
+//             onChange={(e) => {
+//               const text = e.target.value;
+//               const words = text.trim().split(/\s+/).filter(Boolean);
+//               if (words.length <= MAX_WORDS) {
+//                 setDescription(text);
+//                 setDescError("");
+//               }
+//             }}
+//           />
+//           <div className="flex justify-between text-sm mt-1">
+//             <span className="text-gray-500">
+//               {wordCount}/{MAX_WORDS} words
+//             </span>
+//             {descError && <span className="text-red-600">{descError}</span>}
+//           </div>
+//         </div>
+
+//         <button
+//           onClick={handleSubmit}
+//           className="w-full py-3 bg-gradient-to-r from-[#34a1eb] to-[#9c371e] text-white font-semibold rounded-lg"
+//         >
+//           Submit Project
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+// import { useEffect, useState } from "react";
+// import { supabase } from "../lib/supabase";
+// import { useAuth } from "../contexts/AuthContext";
+
+// /* ---------- TYPES ---------- */
+// interface Team {
+//   leader_id: string;
+// }
+
+// interface SubmissionRow {
+//   id: string;
+//   team_id: string;
+//   problem_statement_id: string;
+//   drive_link: string;
+//   additional_link: string | null;
+//   description: string;
+// }
+
+// /* ---------- HELPERS ---------- */
+// const MAX_WORDS = 500;
+
+// const normalizeUrl = (url: string) => {
+//   if (!url.startsWith("http://") && !url.startsWith("https://")) {
+//     return `https://${url}`;
+//   }
+//   return url;
+// };
+
+// /* ================= COMPONENT ================= */
+// export default function Submission() {
+//   const { user, profile, loading } = useAuth();
+
+//   const [submission, setSubmission] = useState<SubmissionRow | null>(null);
+//   const [isLeader, setIsLeader] = useState(false);
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [pageLoading, setPageLoading] = useState(true);
+
+//   const [problemStatementId, setProblemStatementId] = useState("");
+//   const [driveLink, setDriveLink] = useState("");
+//   const [additionalLink, setAdditionalLink] = useState("");
+//   const [description, setDescription] = useState("");
+
+//   const wordCount = description.trim().split(/\s+/).filter(Boolean).length;
+
+//   /* ---------- LOAD DATA ---------- */
+//   useEffect(() => {
+//     if (loading || !profile?.team_id || !user?.id) {
+//       setPageLoading(false);
+//       return;
+//     }
+
+//     const load = async () => {
+//       // Fetch team and leader
+//       const { data: team } = await supabase
+//         .from("teams")
+//         .select("leader_id")
+//         .eq("id", profile.team_id)
+//         .single<Team>();
+
+//       const leader = team?.leader_id === user.id;
+//       setIsLeader(leader);
+
+//       // Fetch submission
+//       const { data } = await supabase
+//         .from("submissions")
+//         .select("*")
+//         .eq("team_id", profile.team_id)
+//         .maybeSingle<SubmissionRow>();
+
+//       if (data) {
+//         setSubmission(data);
+//         setProblemStatementId(data.problem_statement_id);
+//         setDriveLink(data.drive_link);
+//         setAdditionalLink(data.additional_link ?? "");
+//         setDescription(data.description);
+//       }
+
+//       setPageLoading(false);
+//     };
+
+//     load();
+//   }, [loading, profile?.team_id, user?.id]);
+
+//   /* ---------- LOADING ---------- */
+//   if (loading || pageLoading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         Loading submission…
+//       </div>
+//     );
+//   }
+
+//   /* ---------- NO TEAM ---------- */
+//   if (!profile?.team_id) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         You must join or create a team before submitting.
+//       </div>
+//     );
+//   }
+
+//   /* ================= READ-ONLY VIEW (HARD-LOCKED) ================= */
+//   if (submission && !isEditing) {
+//     const showEdit = isLeader === true; // HARD GUARD
+
+//     return (
+//       <div className="min-h-screen bg-gradient-to-br from-[#34a1eb]/10 via-white to-[#9c371e]/10 py-20 px-4">
+//         <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl p-10 space-y-6">
+//           <h2 className="text-3xl font-bold">Your Team Submission</h2>
+
+//           <div>
+//             <p className="text-sm text-gray-500">Problem Statement</p>
+//             <p className="text-lg font-semibold">
+//               {submission.problem_statement_id}
+//             </p>
+//           </div>
+
+//           <div>
+//             <p className="text-sm text-gray-500">Drive Link</p>
+//             <a
+//               href={normalizeUrl(submission.drive_link)}
+//               target="_blank"
+//               rel="noopener noreferrer"
+//               className="text-[#34a1eb] underline break-all"
+//             >
+//               {submission.drive_link}
+//             </a>
+//           </div>
+
+//           {submission.additional_link && (
+//             <div>
+//               <p className="text-sm text-gray-500">Additional Link</p>
+//               <a
+//                 href={normalizeUrl(submission.additional_link)}
+//                 target="_blank"
+//                 rel="noopener noreferrer"
+//                 className="text-[#9c371e] underline break-all"
+//               >
+//                 {submission.additional_link}
+//               </a>
+//             </div>
+//           )}
+
+//           <div className="bg-gray-50 border rounded-xl p-6">
+//             <p className="text-sm text-gray-500 mb-2">Project Description</p>
+//             <p className="whitespace-pre-line">{submission.description}</p>
+//           </div>
+
+//           {/* STATUS — NO UI LEAK POSSIBLE */}
+//           <div className="flex items-center gap-4 pt-4">
+//             <span className="px-4 py-2 text-sm font-semibold rounded-full bg-green-100 text-green-700">
+//               ✅ Submission Completed
+//             </span>
+
+//             {showEdit && (
+//               <button
+//                 onClick={() => setIsEditing(true)}
+//                 className="text-[#34a1eb] underline font-medium"
+//               >
+//                 Edit Submission
+//               </button>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   /* ================= SAVE (LEADER ONLY) ================= */
+//   const handleSave = async () => {
+//     if (!isLeader || wordCount > MAX_WORDS) return;
+
+//     const payload = {
+//       problem_statement_id: problemStatementId,
+//       drive_link: driveLink,
+//       additional_link: additionalLink || null,
+//       description,
+//     };
+
+//     const { error } = submission
+//       ? await supabase
+//           .from("submissions")
+//           .update(payload)
+//           .eq("team_id", profile.team_id)
+//       : await supabase.from("submissions").insert({
+//           ...payload,
+//           team_id: profile.team_id,
+//           uploaded_by: user?.id,
+//         });
+
+//     if (error) {
+//       alert(error.message);
+//     } else {
+//       window.location.reload();
+//     }
+//   };
+
+//   /* ================= EDIT FORM (LEADER ONLY) ================= */
+//   if (!isLeader) return null;
+
+//   return (
+//     <div className="min-h-screen bg-gray-50 py-20 px-4">
+//       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8 space-y-6">
+//         <h2 className="text-2xl font-bold">Edit Submission</h2>
+
+//         <input
+//           className="w-full border rounded-lg px-4 py-2"
+//           value={problemStatementId}
+//           onChange={(e) => setProblemStatementId(e.target.value)}
+//         />
+
+//         <input
+//           className="w-full border rounded-lg px-4 py-2"
+//           value={driveLink}
+//           onChange={(e) => setDriveLink(e.target.value)}
+//         />
+
+//         <input
+//           className="w-full border rounded-lg px-4 py-2"
+//           value={additionalLink}
+//           onChange={(e) => setAdditionalLink(e.target.value)}
+//         />
+
+//         <textarea
+//           rows={6}
+//           className="w-full border rounded-lg px-4 py-2"
+//           value={description}
+//           onChange={(e) => {
+//             const text = e.target.value;
+//             if (text.trim().split(/\s+/).length <= MAX_WORDS) {
+//               setDescription(text);
+//             }
+//           }}
+//         />
+
+//         <div className="text-sm text-gray-500">
+//           {wordCount}/{MAX_WORDS} words
+//         </div>
+
+//         <div className="flex gap-4">
+//           <button
+//             onClick={handleSave}
+//             className="flex-1 py-3 bg-gradient-to-r from-[#34a1eb] to-[#9c371e] text-white font-semibold rounded-lg"
+//           >
+//             Save Changes
+//           </button>
+
+//           <button
+//             onClick={() => setIsEditing(false)}
+//             className="flex-1 py-3 border rounded-lg"
+//           >
+//             Cancel
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+// import { useEffect, useState } from "react";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../contexts/AuthContext";
 
+/* ---------- TYPES ---------- */
+interface SubmissionRow {
+  id: string;
+  team_id: string;
+  team_name: string;
+  problem_statement_id: string;
+  drive_link: string;
+  additional_link: string | null;
+  description: string;
+}
+
+interface TeamRow {
+  leader_id: string;
+  name: string;
+}
+
+/* ---------- CONSTANTS ---------- */
 const MAX_WORDS = 500;
+
+/* ---------- HELPERS ---------- */
+const normalizeUrl = (url: string) =>
+  url.startsWith("http://") || url.startsWith("https://")
+    ? url
+    : `https://${url}`;
+
+const countWords = (text: string) =>
+  text.trim().split(/\s+/).filter(Boolean).length;
+
+/* ================= COMPONENT ================= */
 
 export default function Submission() {
   const { user, profile, loading } = useAuth();
 
-  const [submission, setSubmission] = useState<any>(null);
+  const [submission, setSubmission] = useState<SubmissionRow | null>(null);
+  const [isLeader, setIsLeader] = useState(false);
+  const [teamName, setTeamName] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
 
   const [problemStatementId, setProblemStatementId] = useState("");
   const [driveLink, setDriveLink] = useState("");
   const [additionalLink, setAdditionalLink] = useState("");
   const [description, setDescription] = useState("");
-  const [descError, setDescError] = useState("");
 
-  const wordCount = description.trim().split(/\s+/).filter(Boolean).length;
+  const wordCount = countWords(description);
 
-  /* ---------------- FETCH SUBMISSION ---------------- */
+  /* ---------- LOAD DATA ---------- */
   useEffect(() => {
-    if (loading) return;
-
-    if (!profile?.team_id) {
+    if (loading || !profile?.team_id || !user?.id) {
       setPageLoading(false);
       return;
     }
 
-    const fetchSubmission = async () => {
-      const { data } = await supabase
+    const loadData = async () => {
+      // Fetch team (leader + name)
+      const { data: team } = await supabase
+        .from("teams")
+        .select("leader_id, name")
+        .eq("id", profile.team_id)
+        .single<TeamRow>();
+
+      if (team) {
+        setIsLeader(team.leader_id === user.id);
+        setTeamName(team.name);
+      }
+
+      // Fetch submission
+      const { data: submissionData } = await supabase
         .from("submissions")
         .select("*")
-        .eq("team_id", profile.team_id as string)
-        .maybeSingle();
+        .eq("team_id", profile.team_id)
+        .maybeSingle<SubmissionRow>();
 
-      setSubmission(data ?? null);
+      if (submissionData) {
+        setSubmission(submissionData);
+        setProblemStatementId(submissionData.problem_statement_id);
+        setDriveLink(submissionData.drive_link);
+        setAdditionalLink(submissionData.additional_link ?? "");
+        setDescription(submissionData.description);
+      }
+
       setPageLoading(false);
     };
 
-    fetchSubmission();
-  }, [loading, profile?.team_id]);
+    loadData();
+  }, [loading, profile?.team_id, user?.id]);
 
-  /* ---------------- DELETE SUBMISSION ---------------- */
-  const handleDeleteSubmission = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this submission? You can submit again after deleting.",
-    );
-
-    if (!confirmDelete) return;
-
-    const { error } = await supabase
-      .from("submissions")
-      .delete()
-      .eq("team_id", profile?.team_id as string);
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Submission deleted. You can submit again.");
-      window.location.reload();
-    }
-  };
-
-  /* ---------------- LOADING ---------------- */
+  /* ---------- LOADING ---------- */
   if (loading || pageLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Loading submission…</p>
+        Loading submission…
       </div>
     );
   }
 
-  /* ---------------- NO TEAM ---------------- */
+  /* ---------- NO TEAM ---------- */
   if (!profile?.team_id) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="bg-white shadow-xl rounded-2xl p-8 max-w-md text-center">
-          <h2 className="text-xl font-bold mb-2">No Team Found</h2>
-          <p className="text-gray-600">
-            You must join or create a team before submitting your project.
-          </p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        You must join or create a team before submitting.
       </div>
     );
   }
-  const normalizeUrl = (url: string) => {
-    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-      return `https://${url}`;
-    }
-    return url;
-  };
 
-  /* ================= ALREADY SUBMITTED ================= */
-  if (submission) {
+  /* ================= READ ONLY VIEW ================= */
+  if (submission && !isEditing) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#34a1eb]/10 via-white to-[#9c371e]/10 py-20 px-4">
-        <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-3xl p-10 space-y-8">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Your Team Submission
-          </h2>
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl p-10 space-y-6">
+          <h2 className="text-3xl font-bold">Your Team Submission</h2>
 
-          {/* Problem Statement */}
           <div>
-            <p className="text-sm text-gray-500 mb-1">Problem Statement</p>
-            <p className="text-lg font-semibold text-gray-800">
+            <p className="text-sm text-gray-500">Problem Statement</p>
+            <p className="text-lg font-semibold">
               {submission.problem_statement_id}
             </p>
           </div>
 
-          {/* TEXT LINKS — OPEN IN NEW TAB */}
-          <div className="space-y-4">
+          <div>
+            <p className="text-sm text-gray-500">Drive Link</p>
+            <a
+              href={normalizeUrl(submission.drive_link)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#34a1eb] underline break-all"
+            >
+              {submission.drive_link}
+            </a>
+          </div>
+
+          {submission.additional_link && (
             <div>
-              <p className="text-sm text-gray-500 mb-1">Drive Link</p>
+              <p className="text-sm text-gray-500">Additional Link</p>
               <a
-                href={normalizeUrl(submission.drive_link)}
+                href={normalizeUrl(submission.additional_link)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#34a1eb] font-medium underline break-all hover:text-[#2891db]"
+                className="text-[#9c371e] underline break-all"
               >
-                {submission.drive_link}
+                {submission.additional_link}
               </a>
             </div>
+          )}
 
-            {submission.additional_link && (
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Additional Link</p>
-                <a
-                  href={normalizeUrl(submission.additional_link)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#9c371e] font-medium underline break-all hover:text-[#8a2f19]"
-                >
-                  {submission.additional_link}
-                </a>
-              </div>
-            )}
-          </div>
-
-          {/* Description */}
           <div className="bg-gray-50 border rounded-xl p-6">
             <p className="text-sm text-gray-500 mb-2">Project Description</p>
-            <p className="text-gray-800 whitespace-pre-line leading-relaxed">
-              {submission.description}
-            </p>
+            <p className="whitespace-pre-line">{submission.description}</p>
           </div>
 
-          {/* Status + Delete */}
-          <div className="flex flex-wrap items-center gap-4 pt-4">
-            <span className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-green-100 text-green-700">
+          <div className="flex items-center gap-4 pt-4">
+            <span className="px-4 py-2 text-sm font-semibold rounded-full bg-green-100 text-green-700">
               ✅ Submission Completed
             </span>
 
-            <button
-              onClick={handleDeleteSubmission}
-              className="text-sm font-medium text-red-600 underline hover:text-red-700"
-            >
-              Delete & Update Submission
-            </button>
+            {isLeader && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-[#34a1eb] underline font-medium"
+              >
+                Edit Submission
+              </button>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
-  /* ---------------- SUBMIT ---------------- */
-  const handleSubmit = async () => {
-    if (!user || !profile?.team_id) return;
-
+  /* ================= SAVE (LEADER ONLY) ================= */
+  const handleSave = async () => {
+    if (!isLeader) return;
     if (wordCount > MAX_WORDS) {
-      setDescError("Description must be within 500 words.");
+      alert("Description exceeds 500 words");
       return;
     }
 
-    const { error } = await supabase.from("submissions").insert({
-      team_id: profile.team_id as string,
-      team_name: "AUTO",
+    const payload = {
       problem_statement_id: problemStatementId,
       drive_link: driveLink,
       additional_link: additionalLink || null,
       description,
-      uploaded_by: user.id,
-    } as any);
+    };
+
+    const { error } = submission
+      ? await supabase
+          .from("submissions")
+          .update(payload)
+          .eq("team_id", profile.team_id)
+      : await supabase.from("submissions").insert({
+          ...payload,
+          team_id: profile.team_id,
+          team_name: teamName, // ✅ FIXED
+          uploaded_by: user?.id,
+        });
 
     if (error) {
       alert(error.message);
     } else {
-      alert("Submission successful!");
       window.location.reload();
     }
   };
 
-  /* ---------------- FORM ---------------- */
+  /* ================= EDIT FORM (LEADER ONLY) ================= */
+  if (!isLeader) return null;
+
   return (
     <div className="min-h-screen bg-gray-50 py-20 px-4">
-      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8 space-y-6">
-        <h2 className="text-2xl font-bold">Project Submission</h2>
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8 space-y-6">
+        <h2 className="text-2xl font-bold">Edit Submission</h2>
 
         <input
           className="w-full border rounded-lg px-4 py-2"
@@ -217,40 +750,37 @@ export default function Submission() {
           onChange={(e) => setAdditionalLink(e.target.value)}
         />
 
-        {/* Description */}
-        <div>
-          <label className="block font-semibold mb-1">
-            Project Description (max 500 words)
-          </label>
-          <textarea
-            rows={6}
-            className={`w-full border rounded-lg px-4 py-2 ${
-              wordCount > MAX_WORDS ? "border-red-500" : ""
-            }`}
-            value={description}
-            onChange={(e) => {
-              const text = e.target.value;
-              const words = text.trim().split(/\s+/).filter(Boolean);
-              if (words.length <= MAX_WORDS) {
-                setDescription(text);
-                setDescError("");
-              }
-            }}
-          />
-          <div className="flex justify-between text-sm mt-1">
-            <span className="text-gray-500">
-              {wordCount}/{MAX_WORDS} words
-            </span>
-            {descError && <span className="text-red-600">{descError}</span>}
-          </div>
+        <textarea
+          rows={6}
+          className="w-full border rounded-lg px-4 py-2"
+          placeholder="Project description (max 500 words)"
+          value={description}
+          onChange={(e) => {
+            if (countWords(e.target.value) <= MAX_WORDS) {
+              setDescription(e.target.value);
+            }
+          }}
+        />
+
+        <div className="text-sm text-gray-500">
+          {wordCount}/{MAX_WORDS} words
         </div>
 
-        <button
-          onClick={handleSubmit}
-          className="w-full py-3 bg-gradient-to-r from-[#34a1eb] to-[#9c371e] text-white font-semibold rounded-lg"
-        >
-          Submit Project
-        </button>
+        <div className="flex gap-4">
+          <button
+            onClick={handleSave}
+            className="flex-1 py-3 bg-gradient-to-r from-[#34a1eb] to-[#9c371e] text-white font-semibold rounded-lg"
+          >
+            Save Changes
+          </button>
+
+          <button
+            onClick={() => setIsEditing(false)}
+            className="flex-1 py-3 border rounded-lg"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
