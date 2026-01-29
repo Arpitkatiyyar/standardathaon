@@ -1,4 +1,230 @@
 
+// import { useEffect, useRef, useState } from 'react'
+// import { AuthProvider, useAuth } from './contexts/AuthContext'
+// import Navigation from './components/Navigation'
+// import HeroSection from './components/HeroSection'
+// import AboutSection from './components/AboutSection'
+// import TimelineSection from './components/TimelineSection'
+// import Eligibility from './components/Eligibility'
+// import Members from './components/Members'
+// import ProblemsSection from './components/ProblemsSection'
+// import FAQ from './components/Faq'
+// import AuthForms from './components/AuthForms'
+// import Dashboard from './components/Dashboard'
+// import Footer from './components/Footer'
+// import {
+//   BrowserRouter,
+//   Routes,
+//   Route,
+//   Navigate,
+//   useLocation,
+//   useNavigate,
+// } from 'react-router-dom'
+
+// /* ---------------- HOME PAGE ---------------- */
+
+// function HomePage({
+//   onNavigate,
+//   onSectionChange,
+// }: {
+//   onNavigate: (section: string) => void
+//   onSectionChange: (section: string) => void
+// }) {
+//   const location = useLocation()
+
+//   const homeRef = useRef<HTMLDivElement>(null)
+//   const aboutRef = useRef<HTMLDivElement>(null)
+//   const timelineRef = useRef<HTMLDivElement>(null)
+//   const eligibilityRef = useRef<HTMLDivElement>(null)
+//   const membersRef = useRef<HTMLDivElement>(null)
+//   const problemsRef = useRef<HTMLDivElement>(null)
+//   const faqRef = useRef<HTMLDivElement>(null)
+
+//   /* ✅ Scroll to section ONLY when URL changes (clicks) */
+//   useEffect(() => {
+//     const map: Record<string, HTMLDivElement | null> = {
+//       '/': homeRef.current,
+//       '/about': aboutRef.current,
+//       '/timeline': timelineRef.current,
+//       '/eligibility': eligibilityRef.current,
+//       '/members': membersRef.current,
+//       '/problems': problemsRef.current,
+//       '/faq': faqRef.current,
+//     }
+
+//     const el = map[location.pathname]
+//     if (el) {
+//       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+//     }
+//   }, [location.pathname])
+
+//   /* ✅ Scroll observer ONLY updates active section (NO routing) */
+//   useEffect(() => {
+//     const sections = [
+//       homeRef,
+//       aboutRef,
+//       timelineRef,
+//       eligibilityRef,
+//       membersRef,
+//       problemsRef,
+//       faqRef,
+//     ]
+
+//     const observer = new IntersectionObserver(
+//       (entries) => {
+//         entries.forEach((entry) => {
+//           if (entry.isIntersecting) {
+//             onSectionChange(entry.target.id)
+//           }
+//         })
+//       },
+//       { rootMargin: '-45% 0px -45% 0px' }
+//     )
+
+//     sections.forEach(ref => ref.current && observer.observe(ref.current))
+//     return () => observer.disconnect()
+//   }, [])
+
+//   return (
+//     <>
+//       <div ref={homeRef} id="home" className="min-h-screen scroll-mt-24">
+//         <HeroSection onNavigate={onNavigate} />
+//       </div>
+
+//       <div ref={aboutRef} id="about" className="min-h-screen scroll-mt-24">
+//         <AboutSection />
+//       </div>
+
+//       <div ref={timelineRef} id="timeline" className="min-h-screen scroll-mt-24">
+//         <TimelineSection />
+//       </div>
+
+//       <div ref={eligibilityRef} id="eligibility" className="min-h-screen scroll-mt-24">
+//         <Eligibility />
+//       </div>
+
+//       <div ref={membersRef} id="members" className="min-h-screen scroll-mt-24">
+//         <Members />
+//       </div>
+
+//       <div ref={problemsRef} id="problems" className="min-h-screen scroll-mt-24">
+//         <ProblemsSection />
+//       </div>
+
+//       <div ref={faqRef} id="faq" className="min-h-screen scroll-mt-24">
+//         <FAQ />
+//       </div>
+//     </>
+//   )
+// }
+
+// /* ---------------- ROUTES ---------------- */
+
+// function AppRoutes() {
+//   const { loading, user } = useAuth()
+//   const location = useLocation()
+//   const navigate = useNavigate()
+
+//   const [activeSection, setActiveSection] = useState('home')
+
+//   const pathToView: Record<string, string> = {
+//     '/': 'home',
+//     '/about': 'about',
+//     '/timeline': 'timeline',
+//     '/eligibility': 'eligibility',
+//     '/members': 'members',
+//     '/problems': 'problems',
+//     '/faq': 'faq',
+//     '/auth': 'auth',
+//     '/dashboard': 'dashboard',
+//   }
+
+//   const currentView =
+//     location.pathname === '/'
+//       ? activeSection
+//       : pathToView[location.pathname] ?? 'home'
+
+//   const handleNavigate = (section: string) => {
+//     const map: Record<string, string> = {
+//       home: '/',
+//       about: '/about',
+//       timeline: '/timeline',
+//       eligibility: '/eligibility',
+//       members: '/members',
+//       problems: '/problems',
+//       faq: '/faq',
+//       auth: '/auth',
+//       dashboard: '/dashboard',
+//     }
+
+//     navigate(map[section] ?? '/', {
+//       replace: true,
+//       preventScrollReset: true,
+//     })
+//   }
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#34a1eb]/10 to-[#9c371e]/10">
+//         <div className="w-16 h-16 border-4 border-[#34a1eb] border-t-transparent rounded-full animate-spin" />
+//       </div>
+//     )
+//   }
+
+//   return (
+//     <div className="min-h-screen bg-white flex flex-col">
+//       <Navigation onNavigate={handleNavigate} currentView={currentView} />
+
+//       <div className="flex-1">
+//         <Routes>
+//           {['/', '/about', '/timeline', '/eligibility', '/members', '/problems', '/faq'].map(
+//             (path) => (
+//               <Route
+//                 key={path}
+//                 path={path}
+//                 element={
+//                   <HomePage
+//                     onNavigate={handleNavigate}
+//                     onSectionChange={setActiveSection}
+//                   />
+//                 }
+//               />
+//             )
+//           )}
+
+//           <Route path="/auth" element={<AuthForms onNavigate={handleNavigate} />} />
+
+//           <Route
+//             path="/dashboard"
+//             element={
+//               user && user.email_confirmed_at ? (
+//                 <Dashboard />
+//               ) : (
+//                 <Navigate to="/auth" replace />
+//               )
+//             }
+//           />
+
+//           <Route path="*" element={<Navigate to="/" replace />} />
+//         </Routes>
+//       </div>
+
+//       <Footer onNavigate={handleNavigate} />
+//     </div>
+//   )
+// }
+
+// /* ---------------- ROOT ---------------- */
+
+// export default function App() {
+//   return (
+//     <AuthProvider>
+//       <BrowserRouter>
+//         <AppRoutes />
+//       </BrowserRouter>
+//     </AuthProvider>
+//   )
+// }
 import { useEffect, useRef, useState } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Navigation from './components/Navigation'
@@ -11,6 +237,7 @@ import ProblemsSection from './components/ProblemsSection'
 import FAQ from './components/Faq'
 import AuthForms from './components/AuthForms'
 import Dashboard from './components/Dashboard'
+import Submission from './components/Submission' // ✅ ADDED
 import Footer from './components/Footer'
 import {
   BrowserRouter,
@@ -40,7 +267,6 @@ function HomePage({
   const problemsRef = useRef<HTMLDivElement>(null)
   const faqRef = useRef<HTMLDivElement>(null)
 
-  /* ✅ Scroll to section ONLY when URL changes (clicks) */
   useEffect(() => {
     const map: Record<string, HTMLDivElement | null> = {
       '/': homeRef.current,
@@ -58,7 +284,6 @@ function HomePage({
     }
   }, [location.pathname])
 
-  /* ✅ Scroll observer ONLY updates active section (NO routing) */
   useEffect(() => {
     const sections = [
       homeRef,
@@ -137,6 +362,7 @@ function AppRoutes() {
     '/faq': 'faq',
     '/auth': 'auth',
     '/dashboard': 'dashboard',
+    '/submission': 'submission', // ✅ ADDED
   }
 
   const currentView =
@@ -155,6 +381,7 @@ function AppRoutes() {
       faq: '/faq',
       auth: '/auth',
       dashboard: '/dashboard',
+      submission: '/submission', // ✅ ADDED
     }
 
     navigate(map[section] ?? '/', {
@@ -199,6 +426,18 @@ function AppRoutes() {
             element={
               user && user.email_confirmed_at ? (
                 <Dashboard />
+              ) : (
+                <Navigate to="/auth" replace />
+              )
+            }
+          />
+
+          {/* ✅ SUBMISSION ROUTE (ADDED) */}
+          <Route
+            path="/submission"
+            element={
+              user && user.email_confirmed_at ? (
+                <Submission />
               ) : (
                 <Navigate to="/auth" replace />
               )
