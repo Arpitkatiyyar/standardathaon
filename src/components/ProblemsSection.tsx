@@ -1,102 +1,140 @@
-import { useState, useEffect } from 'react';
-import { Code, Database, Cpu, Smartphone, Brain, Globe, Filter } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { useState, useEffect } from "react";
+import {
+  Code,
+  Database,
+  Cpu,
+  Smartphone,
+  Brain,
+  Globe,
+  Filter,
+} from "lucide-react";
 
+/* ---------- TYPES ---------- */
 interface ProblemStatement {
   id: string;
   title: string;
   domain: string;
   description: string;
   expected_outcomes: string;
-  created_at: string;
 }
 
-const domainIcons: { [key: string]: typeof Code } = {
-  'AI & Manufacturing': Brain,
-  'Blockchain & Security': Database,
-  'IoT & Automation': Cpu,
-  'Mobile Development': Smartphone,
-  'Data Science & ML': Brain,
-  'Web Development & Database': Globe,
+/* ---------- DOMAIN ICONS ---------- */
+const domainIcons: { [key: string]: any } = {
+  "AI & Manufacturing": Brain,
+  "Blockchain & Security": Database,
+  "IoT & Automation": Cpu,
+  "Mobile Development": Smartphone,
+  "Data Science & ML": Brain,
+  "Web Development & Database": Globe,
 };
 
-export default function ProblemsSection() {
-  const [problems, setProblems] = useState<ProblemStatement[]>([]);
-  const [filteredProblems, setFilteredProblems] = useState<ProblemStatement[]>([]);
-  const [selectedDomain, setSelectedDomain] = useState<string>('All');
-  const [loading, setLoading] = useState(true);
+/* ---------- SAMPLE DATA ---------- */
+const SAMPLE_PROBLEMS: ProblemStatement[] = [
+  {
+    id: "PS-01",
+    title: "AI-Based Defect Detection in Manufacturing",
+    domain: "AI & Manufacturing",
+    description:
+      "Design an AI system that can automatically detect defects in manufactured components using image or sensor data to improve quality control.",
+    expected_outcomes:
+      "A trained ML model, dataset preprocessing pipeline, and a dashboard to visualize defect predictions.",
+  },
+  {
+    id: "PS-02",
+    title: "Secure Certificate Management Using Blockchain",
+    domain: "Blockchain & Security",
+    description:
+      "Build a blockchain-based system to issue, verify, and revoke digital certificates securely and transparently.",
+    expected_outcomes:
+      "Smart contracts, verification workflow, and a simple UI for issuing and validating certificates.",
+  },
+  {
+    id: "PS-03",
+    title: "Smart Energy Monitoring with IoT",
+    domain: "IoT & Automation",
+    description:
+      "Develop an IoT solution to monitor energy consumption in real time and provide optimization insights.",
+    expected_outcomes:
+      "IoT device simulation, backend data ingestion, and analytics dashboard.",
+  },
+  {
+    id: "PS-04",
+    title: "Campus Navigation Mobile App",
+    domain: "Mobile Development",
+    description:
+      "Create a mobile application that helps new students navigate a large campus using indoor and outdoor maps.",
+    expected_outcomes:
+      "Android/iOS app with map integration, search functionality, and route guidance.",
+  },
+  {
+    id: "PS-05",
+    title: "Predictive Analytics for Student Performance",
+    domain: "Data Science & ML",
+    description:
+      "Use historical academic data to predict student performance and identify at-risk students early.",
+    expected_outcomes:
+      "Data analysis report, ML model, and visualization of predictions.",
+  },
+  {
+    id: "PS-06",
+    title: "Hackathon Management Web Portal",
+    domain: "Web Development & Database",
+    description:
+      "Build a full-stack web portal to manage hackathon registrations, teams, submissions, and judging.",
+    expected_outcomes:
+      "Responsive web app, database schema, and role-based access control.",
+  },
+];
+
+/* ================= COMPONENT ================= */
+
+export default function SampleProblemsSection() {
+  const [selectedDomain, setSelectedDomain] = useState<string>("All");
+  const [filteredProblems, setFilteredProblems] =
+    useState<ProblemStatement[]>(SAMPLE_PROBLEMS);
 
   useEffect(() => {
-    fetchProblems();
-  }, []);
-
-  useEffect(() => {
-    if (selectedDomain === 'All') {
-      setFilteredProblems(problems);
+    if (selectedDomain === "All") {
+      setFilteredProblems(SAMPLE_PROBLEMS);
     } else {
-      setFilteredProblems(problems.filter((p) => p.domain === selectedDomain));
+      setFilteredProblems(
+        SAMPLE_PROBLEMS.filter((p) => p.domain === selectedDomain)
+      );
     }
-  }, [selectedDomain, problems]);
+  }, [selectedDomain]);
 
-  const fetchProblems = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('problem_statements')
-        .select('*')
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setProblems(data || []);
-      setFilteredProblems(data || []);
-    } catch (error) {
-      console.error('Error fetching problems:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const domains = ['All', ...new Set(problems.map((p) => p.domain))];
-
-  if (loading) {
-    return (
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <div className="animate-spin w-12 h-12 border-4 border-[#34a1eb] border-t-transparent rounded-full mx-auto" />
-            <p className="mt-4 text-gray-600">Loading problem statements...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const domains = ["All", ...new Set(SAMPLE_PROBLEMS.map((p) => p.domain))];
 
   return (
     <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
+          {/* HEADER */}
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Problem Statements
+              Sample Problem Statements
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-[#34a1eb] to-[#9c371e] mx-auto mb-6" />
             <p className="text-xl text-gray-600">
-              Choose a problem statement that inspires you
+              Explore curated problem statements for the hackathon
             </p>
           </div>
 
+          {/* FILTER */}
           <div className="flex items-center justify-center mb-12 flex-wrap gap-3">
             <div className="flex items-center space-x-2 text-gray-700 font-medium">
               <Filter size={20} />
               <span>Filter by domain:</span>
             </div>
+
             {domains.map((domain) => (
               <button
                 key={domain}
                 onClick={() => setSelectedDomain(domain)}
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
                   selectedDomain === domain
-                    ? 'bg-[#34a1eb] text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                    ? "bg-[#34a1eb] text-white shadow-lg"
+                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                 }`}
               >
                 {domain}
@@ -104,9 +142,11 @@ export default function ProblemsSection() {
             ))}
           </div>
 
+          {/* CARDS */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProblems.map((problem, index) => {
               const Icon = domainIcons[problem.domain] || Code;
+
               return (
                 <div
                   key={problem.id}
